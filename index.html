@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <title>Homework #4: D3 Joins - CSE 578 - Fall 2022</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="main.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+
+    <style>
+        .myContainer {
+            margin: auto;
+            width: 1210px;
+        }
+
+        body {
+            background-color: #1A1A1D;
+            color: #66FCF1;
+        }
+
+
+        #line_chart_div {
+            height: 605px;
+            padding: 0px;
+        }
+
+        svg {
+            background-color: white;
+            border: 1px solid lightgray;
+            border-radius: 3px;
+            width: 100%;
+            height: 100%;
+        }
+
+        div.tooltip {
+            position: absolute;
+            text-align: center;
+            width: 100px;
+            height: 60px;
+            padding: 2px;
+            font: 12px sans-serif;
+            background: white;
+            border: 2px;
+            border-radius: 8px;
+            border: solid #000;
+            pointer-events: none;
+            padding-top: 10px;
+        }
+
+        .controls {
+            height: auto;
+
+        }
+
+        #country_attributes_list {
+            height: 220px;
+            overflow-y: scroll;
+        }
+
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked+.slider {
+            background-color: #2196F3;
+        }
+
+        input:focus+.slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked+.slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="myContainer">
+        <h1 class="text-center">Homework #4: D3 Joins</h1>
+        <h3 class="text-center">Ishanu Dhar - idhar@asu.edu</h3>
+        <hr>
+        <div class="controls row pl-2">
+            <div class="col-sm-6" style="border-style:double; border-color: #66FCF1; background-color: #1F2833 ;">
+                <div class="row" style="color:#C5C6C7">
+                    <h4 style="margin: 2px;">
+                        Regions
+                    </h4>
+                    <div class="" style="color:#66FCF1" id="country_region_list">
+
+                    </div>
+                </div>
+            </div>
+            <div id="other-controls" class="col-sm-6"
+                style="border-style:double; border-color: #66FCF1; background-color: #1F2833 ;">
+                <div class="row pt-2">
+                    <div class="col-sm-3">
+                        <label>
+                            Global Indicator
+                        </label>
+                    </div>
+                    <div class="col-sm-9">
+                        <select style="width:60%; color: black;" name="attribute" id="attributes-select"
+                            onchange="changeAttribute()">
+                            <option value="Data.Health.Birth Rate">Birth Rate</option>
+                            <option value="Data.Health.Death Rate">Death Rate</option>
+                            <option value="Data.Infrastructure.Telephone Lines per 100 People">Telephone line per 100
+                                people</option>
+                            <option value="Data.Health.Fertility Rate">Fertility Rate</option>
+                            <option value="Data.Rural Development.Arable Land Percent">Arable Land Percent</option>
+                            <option value="Data.Health.Life Expectancy at Birth, Total">Life Expectancy at birth(Total)
+                            </option>
+                            <option value="Data.Urban Development.Population Density">Urban Population Density</option>
+                            <option value="Data.Infrastructure.Mobile Cellular Subscriptions per 100 People">
+                                Cellular Sub. per 100 people
+                            </option>
+                            <option value="Data.Urban Development.Urban Population Percent">Urban Population %
+                            </option>
+                            <option value="Data.Health.Life Expectancy at Birth, Female">Life Expectancy Female</option>
+                        </select>
+                    </div>
+                </div>
+
+                <br>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <label for="vol">Opacity Control:</label>
+                    </div>
+                    <div class="col-sm-9">
+                        <input style="width:60%;" type="range" id="vol" name="vol" min="40" max="80" value="80"
+                            onchange="setOpacity(this.value)">
+                    </div>
+                </div>
+                <br>
+                <!--<input type="submit">-->
+                <div class="row p-2">
+                    <div class="col-sm-6">
+                        <div class="row">
+                            <div class="pl-2" style="vertical-align: middle;">
+                                <span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="flag-select" onclick="flagSwitch(event)">
+                                        <span class="slider round"></span>
+
+                                    </label>
+
+                                    <label>
+                                        Show Flags
+                                    </label>
+
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <button type="button" class="btn btn-default btn-sm .st-color">
+                            <span class="glyphicon glyphicon-play"></span> Play
+                        </button>
+                    </div>
+
+
+
+                </div>
+                <div class="row p-2 m-1" style="background-color: #66FCF1; color: #1F2833;">
+                <div class="col-sm-3">
+                    <input type="text" id="start-year" class="form-control"  pattern="\d{4}" placeholder="start year"></input>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" id="end-year" class="form-control"  pattern="\d{4}" placeholder="end year"></input>
+
+                </div>
+                <div class="col-sm-6">
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-secondary" onclick="setDate()">Apply</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetDate()">Reset</button>
+
+                      </div>
+
+                </div>
+                </div>
+            </div>
+
+        </div>
+        <div id="line_chart_div" class=" row border border-dark rounded bg-light shadow-sm mt-2" style="color: black;">
+
+            <svg id="line_chart_svg"></svg>
+        </div>
+
+    </div>
+</body>
+
+</html>
